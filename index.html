@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FootMatch Organizer PRO - Meudon</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); min-height: 100vh; padding: 10px; }
+        .container { max-width: 1400px; margin: 0 auto; background: white; border-radius: 15px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); overflow: hidden; }
+        header { background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; }
+        header h1 { font-size: 24px; margin-bottom: 10px; }
+        .badge { background: #28a745; padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: bold; }
+        nav { display: flex; gap: 5px; flex-wrap: wrap; }
+        nav button { background: rgba(255,255,255,0.2); color: white; border: 2px solid white; padding: 8px 12px; border-radius: 5px; cursor: pointer; font-weight: bold; transition: 0.3s; font-size: 13px; }
+        nav button:hover, nav button.active { background: white; color: #2a5298; }
+        .content { padding: 20px; }
+        .section { display: none; }
+        .section.active { display: block; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; font-weight: bold; margin-bottom: 5px; color: #333; font-size: 13px; }
+        input, select, textarea { width: 100%; padding: 8px; border: 2px solid #ddd; border-radius: 5px; font-family: inherit; font-size: 13px; }
+        input:focus, select:focus { outline: none; border-color: #2a5298; box-shadow: 0 0 5px rgba(42, 82, 152, 0.3); }
+        .btn { background: #2a5298; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 13px; transition: 0.3s; margin: 5px 5px 5px 0; }
+        .btn:hover { background: #1e3c72; transform: translateY(-2px); }
+        .btn-secondary { background: #6c757d; }
+        .btn-secondary:hover { background: #5a6268; }
+        .btn-danger { background: #dc3545; }
+        .btn-danger:hover { background: #c82333; }
+        .btn-success { background: #28a745; }
+        .btn-success:hover { background: #218838; }
+        .card { background: #f8f9fa; border-left: 4px solid #2a5298; padding: 15px; margin-bottom: 15px; border-radius: 5px; }
+        .card h3 { color: #2a5298; margin-bottom: 10px; font-size: 16px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
+        .stat-box { background: #f8f9fa; padding: 15px; text-align: center; border-radius: 5px; }
+        .stat-box .number { font-size: 28px; font-weight: bold; color: #2a5298; }
+        .stat-box .label { color: #666; margin-top: 5px; font-size: 12px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 13px; }
+        table th { background: #2a5298; color: white; padding: 10px; text-align: left; }
+        table td { padding: 10px; border-bottom: 1px solid #ddd; }
+        table tr:hover { background: #f8f9fa; }
+        .badge-status { display: inline-block; padding: 4px 8px; border-radius: 15px; font-size: 11px; font-weight: bold; }
+        .badge-paid { background: #d4edda; color: #155724; }
+        .badge-pending { background: #fff3cd; color: #856404; }
+        .leaderboard-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; background: #f8f9fa; margin-bottom: 8px; border-radius: 5px; border-left: 4px solid #2a5298; font-size: 13px; }
+        .rank { width: 25px; height: 25px; background: #2a5298; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; margin-right: 10px; }
+        .admin-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-top: 20px; }
+        .admin-btn { background: #17a2b8; color: white; padding: 30px; text-align: center; border-radius: 10px; cursor: pointer; transition: 0.3s; border: none; font-size: 14px; font-weight: bold; }
+        .admin-btn:hover { background: #138496; }
+        .admin-section { margin-top: 30px; }
+        .payment-buttons { display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
+        .payment-btn { flex: 1; min-width: 100px; padding: 10px; border-radius: 5px; cursor: pointer; font-weight: bold; border: none; color: white; transition: 0.3s; }
+        .payment-btn-revolut { background: #0066FF; }
+        .payment-btn-revolut:hover { background: #0052CC; }
+        .team-container { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px; }
+        .team { background: #f8f9fa; padding: 15px; border-radius: 5px; border-left: 4px solid #2a5298; }
+        .team h3 { color: #2a5298; margin-bottom: 10px; }
+        .team-player { padding: 8px; background: white; margin-bottom: 5px; border-radius: 3px; font-size: 13px; }
+        hr { margin: 20px 0; border: none; border-top: 2px solid #ddd; }
+        @media (max-width: 768px) { header { flex-direction: column; } nav { width: 100%; } nav button { flex: 1; } .grid { grid-template-columns: 1fr; } table { font-size: 11px; } .team-container { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div>
+                <h1>⚽ FootMatch Organizer PRO</h1>
+                <span class="badge">🌐 MEUDON EDITION</span>
+            </div>
+            <nav>
+                <button class="nav-btn active" onclick="switchView('dashboard')">🏠 Accueil</button>
+                <button class="nav-btn" onclick="switchView('matches')">⚽ Matchs</button>
+                <button class="nav-btn" onclick="switchView('players')">👥 Joueurs</button>
+                <button class="nav-btn" onclick="switchView('stats')">📊 Stats</button>
+                <button class="nav-btn" onclick="switchView('admin')">⚙️ Admin</button>
+            </nav>
+        </header>
+
+        <div class="content">
+            <!-- DASHBOARD -->
+            <div id="dashboard" class="section active">
+                <h2>📊 Dashboard</h2>
+                <div class="grid">
+                    <div class="stat-box"><div class="number" id="totalMatches">0</div><div class="label">Matchs</div></div>
+                    <div class="stat-box"><div class="number" id="totalPlayers">0</div><div class="label">Joueurs</div></div>
+                    <div class="stat-box"><div class="number" id="totalGoals">0</div><div class="label">Buts</div></div>
+                    <div class="stat-box"><div class="number" id="totalAssists">0</div><div class="label">Passes</div></div>
+                </div>
+                <h3 style="margin-top: 30px;">💰 Statistiques Paiements</h3>
+                <div class="grid">
+                    <div class="stat-box"><div class="number" id="totalCollected">0€</div><div class="label">Collecté</div></div>
+                    <div class="stat-box"><div class="number" id="totalPending">0€</div><div class="label">En Attente</div></div>
+                    <div class="stat-box"><div class="number" id="pendingCount">0</div><div class="label">Paiements En Attente</div></div>
+                </div>
+            </div>
+
+            <!-- MATCHS -->
+            <div id="matches" class="section">
+                <h2>⚽ Matchs</h2>
+                <h3 style="margin-top: 20px;">Matchs à Venir</h3>
+                <div id="matchesList"></div>
+            </div>
+
+            <!-- JOUEURS -->
+            <div id="players" class="section">
+                <h2>👥 Joueurs</h2>
+                <h3 style="margin-top: 20px;">Liste des Joueurs</h3>
+                <div id="playersList"></div>
+            </div>
+
+            <!-- STATS -->
+            <div id="stats" class="section">
+                <h2>📊 Statistiques</h2>
+                <h3>🥅 Top Scorers</h3>
+                <div id="topScorers" class="leaderboard"></div>
+                <h3 style="margin-top: 30px;">🎯 Top Assisters</h3>
+                <div id="topAssisters" class="leaderboard"></div>
+            </div>
+
+            <!-- ADMIN -->
+            <div id="admin" class="section">
+                <h2>⚙️ Admin Panel</h2>
+                <div id="adminLogin" class="form-group">
+                    <label>Mot de passe Admin</label>
+                    <input type="password" id="adminPassword" placeholder="Entrez le mot de passe">
+                    <button class="btn" onclick="loginAdmin()">Connexion</button>
+                </div>
+                <div id="adminPanel" style="display: none;">
+                    <div class="admin-grid">
+                        <button class="admin-btn" onclick="showAdminSection('config')">⚙️ Configuration</button>
+                        <button class="admin-btn" onclick="showAdminSection('players_mgmt')">👥 Joueurs</button>
+                        <button class="admin-btn" onclick="showAdminSection('matches_mgmt')">⚽ Matchs</button>
+                        <button class="admin-btn" onclick="showAdminSection('teams')">👨‍👩‍👧‍👦 Équipes</button>
+                        <button class="admin-btn" onclick="showAdminSection('payments')">💰 Paiements</button>
+                        <button class="admin-btn" onclick="showAdminSection('reports')">📊 Rapports</button>
+                    </div>
+
+                    <!-- CONFIGURATION -->
+                    <div id="config" class="admin-section" style="display: none;">
+                        <h3>⚙️ Configuration</h3>
+                        <div class="form-group"><label>Prix par défaut</label><input type="number" id="defaultPrice" value="5"></div>
+                        <div class="form-group"><label>Format par défaut</label><input type="text" id="defaultFormat" value="5x5"></div>
+                        <div class="form-group"><label>Lieu</label><input type="text" id="defaultLocation" value="UrbanSoccer Meudon - Terrain 4"></div>
+                        <div class="form-group"><label>Heure Match</label><input type="time" id="defaultMatchTime" value="11:00"></div>
+                        <div class="form-group"><label>Heure RDV</label><input type="time" id="defaultRDVTime" value="10:45"></div>
+                        <button class="btn" onclick="saveSettings()">💾 Sauvegarder</button>
+                        <button class="btn btn-success" onclick="generateSundays()" style="margin-left: 10px;">🔄 Générer 10 Dimanches</button>
+                    </div>
+
+                    <!-- GESTION JOUEURS -->
+                    <div id="players_mgmt" class="admin-section" style="display: none;">
+                        <h3>👥 Gestion Joueurs</h3>
+                        <div id="playersManagement"></div>
+                    </div>
+
+                    <!-- GESTION MATCHS -->
+                    <div id="matches_mgmt" class="admin-section" style="display: none;">
+                        <h3>⚽ Gestion Matchs</h3>
+                        <div id="matchesManagement"></div>
+                    </div>
+
+                    <!-- AUTO-BALANCE ÉQUIPES -->
+                    <div id="teams" class="admin-section" style="display: none;">
+                        <h3>👨‍👩‍👧‍👦 Auto-Balance des Équipes</h3>
+                        <div class="form-group">
+                            <label>Sélectionnez un match</label>
+                            <select id="teamMatchSelect" onchange="loadTeamsForMatch()"></select>
+                        </div>
+                        <button class="btn btn-success" onclick="generateAutoBalanceTeams()">🔄 Générer Équipes Équilibrées</button>
+                        <div id="teamsDisplay" style="margin-top: 20px;"></div>
+                    </div>
+
+                    <!-- PAIEMENTS -->
+                    <div id="payments" class="admin-section" style="display: none;">
+                        <h3>💰 Gestion des Paiements</h3>
+                        <div class="grid">
+                            <div class="stat-box"><div class="number" id="paymentStats1">0€</div><div class="label">Total Collecté</div></div>
+                            <div class="stat-box"><div class="number" id="paymentStats2">0€</div><div class="label">En Attente</div></div>
+                        </div>
+                        <h4 style="margin-top: 20px;">Liste des Paiements</h4>
+                        <div id="paymentsList"></div>
+                    </div>
+
+                    <!-- RAPPORTS -->
+                    <div id="reports" class="admin-section" style="display: none;">
+                        <h3>📊 Rapports</h3>
+                        <h4>Joueurs les Plus Actifs</h4>
+                        <div id="reportsMostActive"></div>
+                        <h4 style="margin-top: 20px;">Top Buteurs</h4>
+                        <div id="reportsTopScorers"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const ADMIN_PASSWORD = "Meudon2025";
+        const REVOLUT_LINK = "https://revolut.me/ahmed180";
+        
+        let adminLogged = false;
+        let data = {
+            matches: [],
+            players: [],
+            adminPassword: ADMIN_PASSWORD,
+            settings: { 
+                defaultPrice: 5, 
+                defaultFormat: "5x5",
+                defaultLocation: "UrbanSoccer Meudon - Terrain 4",
+                defaultMatchTime: "11:00",
+                defaultRDVTime: "10:45"
+            }
+        };
+
+        window.addEventListener('load', () => {
+            loadAllPlayers();
+            updateAllDisplays();
+            setInterval(updateAllDisplays, 3000);
+            setInterval(checkPaymentReminders, 60000);
+        });
+
+        function loadAllPlayers() {
+            const playersData = [
+                { name: "Abderrahmen Mokrani", phone: "+216 54 190 792", position: "Milieu", foot: "Droit" },
+                { name: "Adrien", phone: "+33 6 43 84 48 94", position: "Milieu", foot: "Droit" },
+                { name: "Amine GRASSI", phone: "+33 6 05 80 65 76", position: "Attaquant", foot: "Droit" },
+                { name: "Fahd Mehdaoui", phone: "+33 6 09 22 82 43", position: "Défenseur", foot: "Droit" },
+                { name: "Hamza", phone: "+33 6 95 94 80 06", position: "Attaquant", foot: "Droit" },
+                { name: "HAMZA IBRAH", phone: "+33 7 64 48 16 16", position: "Milieu", foot: "Droit" },
+                { name: "Hicham Doukkali", phone: "+33 6 68 74 41 32", position: "Défenseur", foot: "Droit" },
+                { name: "Kad", phone: "+33 6 41 18 06 96", position: "Attaquant", foot: "Droit" },
+                { name: "Samy", phone: "+33 6 18 16 37 18", position: "Milieu", foot: "Droit" },
+                { name: "Simo Ayach", phone: "+33 3 26 47 16 01", position: "Défenseur", foot: "Droit" },
+                { name: "Soufiane", phone: "+33 6 41 67 14 47", position: "Gardien", foot: "Droit" },
+                { name: "Yanis", phone: "+33 6 14 94 92 16", position: "Attaquant", foot: "Droit" },
+                { name: "Yass", phone: "+33 7 53 09 33 73", position: "Milieu", foot: "Droit" },
+                { name: "Younesse", phone: "+33 7 73 81 96 18", position: "Défenseur", foot: "Droit" },
+                { name: "Zak.A", phone: "+33 6 52 88 96 84", position: "Attaquant", foot: "Droit" },
+                { name: "Kenz", phone: "+33 6 99 41 94 06", position: "Milieu", foot: "Droit" },
+                { name: "Mo", phone: "+33 6 74 94 32 96", position: "Attaquant", foot: "Droit" },
+                { name: "Mohamed H.", phone: "+33 6 25 90 30 78", position: "Défenseur", foot: "Droit" },
+                { name: "Mouad.B", phone: "+33 6 46 43 62 58", position: "Milieu", foot: "Droit" },
+                { name: "Nabil", phone: "+33 7 51 49 90 94", position: "Attaquant", foot: "Droit" }
+            ];
+
+            playersData.forEach((p, idx) => {
+                data.players.push({
+                    id: idx + 1,
+                    name: p.name,
+                    phone: p.phone,
+                    position: p.position,
+                    foot: p.foot,
+                    goals: 0,
+                    assists: 0,
+                    rating: 3,
+                    matchesPlayed: 0
+                });
+            });
+        }
+
+        function generateSundays() {
+            const today = new Date();
+            let nextSunday = new Date(today);
+            nextSunday.setDate(today.getDate() + (0 - today.getDay() + 7) % 7);
+            
+            for (let i = 0; i < 10; i++) {
+                const matchDate = new Date(nextSunday);
+                matchDate.setDate(nextSunday.getDate() + (i * 7));
+                
+                const dateStr = matchDate.toISOString().split('T')[0];
+                const match = {
+                    id: Date.now() + i,
+                    format: data.settings.defaultFormat,
+                    date: dateStr,
+                    time: data.settings.defaultMatchTime,
+                    rdvTime: data.settings.defaultRDVTime,
+                    location: data.settings.defaultLocation,
+                    price: data.settings.defaultPrice,
+                    maxPlayers: 10,
+                    players: [],
+                    teamA: [],
+                    teamB: [],
+                    status: 'open'
+                };
+                data.matches.push(match);
+            }
+            renderMatches();
+            alert('✅ 10 matchs du dimanche générés !');
+        }
+
+        function updateAllDisplays() {
+            updateDashboard();
+            renderMatches();
+            renderPlayers();
+            updateStats();
+        }
+
+        function switchView(view) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(view).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function renderMatches() {
+            const list = document.getElementById('matchesList');
+            if (data.matches.length === 0) {
+                list.innerHTML = '<p>Aucun match. Créez en un dans l\'admin !</p>';
+                return;
+            }
+            list.innerHTML = data.matches.map(m => {
+                const confirmedPlayers = m.players.filter(p => p.paymentStatus === 'paid');
+                const pendingPlayers = m.players.filter(p => p.paymentStatus === 'pending');
+                return `
+                <div class="card">
+                    <h3>${m.format} - ${m.date} ${m.time}</h3>
+                    <p>📍 ${m.location} | 💵 ${m.price}€ | ✅ ${confirmedPlayers.length}/${m.maxPlayers} | ⏳ ${pendingPlayers.length}</p>
+                    <h4>Joueurs Confirmés :</h4>
+                    ${confirmedPlayers.length > 0 ? `
+                        <table>
+                            <thead><tr><th>Nom</th><th>Position</th><th>Rating</th></tr></thead>
+                            <tbody>
+                                ${confirmedPlayers.map(p => {
+                                    const player = data.players.find(pl => pl.id === p.playerId);
+                                    return `<tr><td>${player ? player.name : 'Inconnu'}</td><td>${player ? player.position : '-'}</td><td>${'⭐'.repeat(Math.round(player ? player.rating : 0))}</td></tr>`;
+                                }).join('')}
+                            </tbody>
+                        </table>
+                    ` : '<p>Aucun joueur confirmé</p>'}
+                    ${pendingPlayers.length > 0 ? `
+                        <h4 style="margin-top: 15px;">⏳ En Attente de Paiement :</h4>
+                        <p>${pendingPlayers.map(p => data.players.find(pl => pl.id === p.playerId)?.name).join(', ')}</p>
+                    ` : ''}
+                    <button class="btn" onclick="registerForMatch(${m.id})">📝 S'inscrire</button>
+                    ${pendingPlayers.length > 0 ? `
+                        <div class="payment-buttons">
+                            <a href="${REVOLUT_LINK}" target="_blank" class="payment-btn payment-btn-revolut">💳 Payer via Revolut</a>
+                        </div>
+                    ` : ''}
+                    <button class="btn btn-secondary" onclick="deleteMatch(${m.id})" style="margin-top: 10px;">🗑️ Supprimer</button>
+                </div>
+            `}).join('');
+        }
+
+        function registerForMatch(matchId) {
+            const match = data.matches.find(m => m.id === matchId);
+            if (!match) return;
+            const playerName = prompt("Entrez votre nom :");
+            if (!playerName) return;
+            const player = data.players.find(p => p.name.toLowerCase() === playerName.toLowerCase());
+            if (!player) {
+                alert('Joueur non trouvé. Veuillez vous enregistrer d\'abord.');
+                return;
+            }
+            if (match.players.find(p => p.playerId === player.id)) {
+                alert('Vous êtes déjà inscrit !');
+                return;
+            }
+            if (match.players.length < match.maxPlayers) {
+                match.players.push({ playerId: player.id, paymentStatus: 'pending', inscriptionTime: Date.now(), lastReminderTime: Date.now() });
+                renderMatches();
+                alert('✅ Inscription en attente de paiement ! Cliquez sur "Payer via Revolut"');
+            } else {
+                alert('❌ Match complet');
+            }
+        }
+
+        function deleteMatch(matchId) {
+            data.matches = data.matches.filter(m => m.id !== matchId);
+            renderMatches();
+        }
+
+        function renderPlayers() {
+            const list = document.getElementById('playersList');
+            if (data.players.length === 0) {
+                list.innerHTML = '<p>Aucun joueur</p>';
+                return;
+            }
+            list.innerHTML = `<table><thead><tr><th>Nom</th><th>Position</th><th>🥅 Buts</th><th>🎯 Passes</th><th>⭐ Rating</th><th>Matchs</th></tr></thead><tbody>${data.players.map(p => `<tr><td>${p.name}</td><td>${p.position}</td><td>${p.goals}</td><td>${p.assists}</td><td>${'⭐'.repeat(Math.round(p.rating))}</td><td>${p.matchesPlayed}</td></tr>`).join('')}</tbody></table>`;
+        }
+
+        function updateStats() {
+            const scorers = [...data.players].sort((a, b) => b.goals - a.goals).slice(0, 5);
+            const assisters = [...data.players].sort((a, b) => b.assists - a.assists).slice(0, 5);
+            
+            document.getElementById('topScorers').innerHTML = scorers.length > 0 ? scorers.map((p, i) => `<div class="leaderboard-item"><div style="display: flex; align-items: center;"><div class="rank">${i+1}</div>${p.name}</div><strong>🥅 ${p.goals}</strong></div>`).join('') : '<p>Pas encore de buts</p>';
+            document.getElementById('topAssisters').innerHTML = assisters.length > 0 ? assisters.map((p, i) => `<div class="leaderboard-item"><div style="display: flex; align-items: center;"><div class="rank">${i+1}</div>${p.name}</div><strong>🎯 ${p.assists}</strong></div>`).join('') : '<p>Pas encore de passes</p>';
+        }
+
+        function updateDashboard() {
+            document.getElementById('totalMatches').textContent = data.matches.length;
+            document.getElementById('totalPlayers').textContent = data.players.length;
+            document.getElementById('totalGoals').textContent = data.players.reduce((s, p) => s + p.goals, 0);
+            document.getElementById('totalAssists').textContent = data.players.reduce((s, p) => s + p.assists, 0);
+            const totalPayments = data.matches.reduce((sum, m) => sum + m.players.filter(p => p.paymentStatus === 'paid').length * m.price, 0);
+            const pendingPayments = data.matches.reduce((sum, m) => sum + m.players.filter(p => p.paymentStatus === 'pending').length * m.price, 0);
+            document.getElementById('totalCollected').textContent = totalPayments + '€';
+            document.getElementById('totalPending').textContent = pendingPayments + '€';
+            document.getElementById('pendingCount').textContent = data.matches.reduce((sum, m) => sum + m.players.filter(p => p.paymentStatus === 'pending').length, 0);
+        }
+
+        function generateAutoBalanceTeams() {
+            const selected = document.getElementById('teamMatchSelect').value;
+            const match = data.matches.find(m => m.id == selected);
+            if (!match) return alert('Sélectionnez un match');
+            
+            const confirmedPlayers = match.players.filter(p => p.paymentStatus === 'paid').map(p => ({
+                ...data.players.find(pl => pl.id === p.playerId),
+                origId: p.playerId
+            }));
+            
+            if (confirmedPlayers.length < 2) return alert('Au moins 2 joueurs confirmés !');
+            
+            confirmedPlayers.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+            
+            match.teamA = [];
+            match.teamB = [];
+            confirmedPlayers.forEach((p, i) => {
+                if (i % 2 === 0) match.teamA.push(p);
+                else match.teamB.push(p);
+            });
+            
+            displayAutoBalanceTeams(match);
+            alert('✅ Équipes générées équilibrées !');
+        }
+
+        function displayAutoBalanceTeams(match) {
+            const html = `
+                <div class="team-container">
+                    <div class="team">
+                        <h3>🔴 Équipe A</h3>
+                        ${match.teamA.map(p => `<div class="team-player">👤 ${p.name} (Rating: ⭐${p.rating})</div>`).join('')}
+                    </div>
+                    <div class="team">
+                        <h3>🔵 Équipe B</h3>
+                        ${match.teamB.map(p => `<div class="team-player">👤 ${p.name} (Rating: ⭐${p.rating})</div>`).join('')}
+                    </div>
+                </div>
+            `;
+            document.getElementById('teamsDisplay').innerHTML = html;
+        }
+
+        function loadTeamsForMatch() {
+            const select = document.getElementById('teamMatchSelect');
+            select.innerHTML = '<option value="">-- Sélectionnez --</option>' + data.matches.map(m => `<option value="${m.id}">${m.date} ${m.time} - ${m.format}</option>`).join('');
+        }
+
+        function checkPaymentReminders() {
+            const now = Date.now();
+            const fortyEightHours = 48 * 60 * 60 * 1000;
+            
+            data.matches.forEach(match => {
+                match.players.forEach(player => {
+                    if (player.paymentStatus === 'pending') {
+                        const timeSinceInscription = now - (player.inscriptionTime || now);
+                        if (timeSinceInscription > fortyEightHours) {
+                            const shouldRemind = !player.lastReminderTime || (now - player.lastReminderTime) > 24 * 60 * 60 * 1000;
+                            if (shouldRemind) {
+                                const playerData = data.players.find(p => p.id === player.playerId);
+                                if (playerData && playerData.phone) {
+                                    sendWhatsAppReminder(playerData.phone, playerData.name, match);
+                                    player.lastReminderTime = now;
+                                }
+                            }
+                        }
+                    }
+                });
+            });
+        }
+
+        function sendWhatsAppReminder(phone, name, match) {
+            const message = `Rappel: ${name}, tu as oublié de payer pour le match du ${match.date} à ${match.time} ! Paie maintenant: ${REVOLUT_LINK}`;
+            console.log('📲 Rappel WhatsApp pour', name, ':', message);
+        }
+
+        function loginAdmin() {
+            if (document.getElementById('adminPassword').value === data.adminPassword) {
+                adminLogged = true;
+                document.getElementById('adminLogin').style.display = 'none';
+                document.getElementById('adminPanel').style.display = 'block';
+                alert('✅ Admin connecté !');
+            } else {
+                alert('❌ Mot de passe incorrect !');
+            }
+        }
+
+        function showAdminSection(section) {
+            document.querySelectorAll('.admin-section').forEach(s => s.style.display = 'none');
+            document.getElementById(section).style.display = 'block';
+            
+            if (section === 'players_mgmt') {
+                document.getElementById('playersManagement').innerHTML = `<table><thead><tr><th>Nom</th><th>Position</th><th>Téléphone</th><th>Buts</th><th>Passes</th><th>Rating</th></tr></thead><tbody>${data.players.map(p => `<tr><td>${p.name}</td><td>${p.position}</td><td>${p.phone}</td><td>${p.goals}</td><td>${p.assists}</td><td>${p.rating.toFixed(1)}</td></tr>`).join('')}</tbody></table>`;
+            }
+            
+            if (section === 'matches_mgmt') {
+                document.getElementById('matchesManagement').innerHTML = data.matches.length > 0 ? `<table><thead><tr><th>Format</th><th>Date</th><th>Lieu</th><th>Joueurs</th><th>Action</th></tr></thead><tbody>${data.matches.map(m => `<tr><td>${m.format}</td><td>${m.date}</td><td>${m.location}</td><td>${m.players.length}/${m.maxPlayers}</td><td><button class="btn btn-danger" style="padding: 4px 8px; font-size: 11px;" onclick="deleteMatch(${m.id})">❌</button></td></tr>`).join('')}</tbody></table>` : '<p>Aucun match</p>';
+            }
+            
+            if (section === 'teams') {
+                loadTeamsForMatch();
+            }
+            
+            if (section === 'payments') {
+                let paymentsHTML = '';
+                data.matches.forEach(m => {
+                    paymentsHTML += `<h4>${m.date} ${m.time}</h4>`;
+                    if (m.players.length > 0) {
+                        paymentsHTML += `<table><thead><tr><th>Joueur</th><th>Montant</th><th>Status</th><th>Action</th></tr></thead><tbody>`;
+                        m.players.forEach(p => {
+                            const player = data.players.find(pl => pl.id === p.playerId);
+                            paymentsHTML += `<tr><td>${player ? player.name : 'Inconnu'}</td><td>${m.price}€</td><td><span class="badge-status ${p.paymentStatus === 'paid' ? 'badge-paid' : 'badge-pending'}">${p.paymentStatus}</span></td><td><button class="btn btn-secondary" style="padding: 4px 8px; font-size: 11px;" onclick="togglePaymentStatus(${m.id}, ${p.playerId})">Toggle</button></td></tr>`;
+                        });
+                        paymentsHTML += `</tbody></table>`;
+                    }
+                });
+                document.getElementById('paymentsList').innerHTML = paymentsHTML;
+                document.getElementById('paymentStats1').textContent = data.matches.reduce((s, m) => s + m.players.filter(p => p.paymentStatus === 'paid').length * m.price, 0) + '€';
+                document.getElementById('paymentStats2').textContent = data.matches.reduce((s, m) => s + m.players.filter(p => p.paymentStatus === 'pending').length * m.price, 0) + '€';
+            }
+            
+            if (section === 'reports') {
+                const mostActive = [...data.players].filter(p => p.matchesPlayed > 0).sort((a, b) => b.matchesPlayed - a.matchesPlayed).slice(0, 5);
+                const topScorers = [...data.players].filter(p => p.goals > 0).sort((a, b) => b.goals - a.goals).slice(0, 5);
+                document.getElementById('reportsMostActive').innerHTML = mostActive.length > 0 ? mostActive.map((p, i) => `<div class="leaderboard-item"><div class="rank">${i+1}</div><span>${p.name}</span><strong>${p.matchesPlayed} matchs</strong></div>`).join('') : '<p>Pas de données</p>';
+                document.getElementById('reportsTopScorers').innerHTML = topScorers.length > 0 ? topScorers.map((p, i) => `<div class="leaderboard-item"><div class="rank">${i+1}</div><span>${p.name}</span><strong>🥅 ${p.goals}</strong></div>`).join('') : '<p>Pas de données</p>';
+            }
+        }
+
+        function togglePaymentStatus(matchId, playerId) {
+            const match = data.matches.find(m => m.id === matchId);
+            if (match) {
+                const player = match.players.find(p => p.playerId === playerId);
+                if (player) {
+                    player.paymentStatus = player.paymentStatus === 'paid' ? 'pending' : 'paid';
+                    updateDashboard();
+                    renderMatches();
+                    showAdminSection('payments');
+                }
+            }
+        }
+
+        function saveSettings() {
+            data.settings.defaultPrice = parseFloat(document.getElementById('defaultPrice').value);
+            data.settings.defaultFormat = document.getElementById('defaultFormat').value;
+            data.settings.defaultLocation = document.getElementById('defaultLocation').value;
+            data.settings.defaultMatchTime = document.getElementById('defaultMatchTime').value;
+            data.settings.defaultRDVTime = document.getElementById('defaultRDVTime').value;
+            alert('💾 Paramètres sauvegardés !');
+        }
+    </script>
+</body>
+</html>
