@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="fr"><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FootMatch Organizer - Gérez vos matchs de foot</title>
+  <style>
+    /* Design System */
+    :root {
+      --color-white: rgba(255, 255, 255, 1);
+      --color-black: rgba(0, 0, 0, 1);
+      --color-cream-50: rgba(252, 252, 249, 1);
+      --color-cream-100: rgba(255, 255, 253, 1);
+      --color-gray-200: rgba(245, 245, 245, 1);
+      --color-gray-300: rgba(167, 169, 169, 1);
+      --color-gray-400: rgba(119, 124, 124, 1);
+      --color-slate-500: rgba(98, 108, 113, 1);
+      --color-brown-600: rgba(94, 82, 64, 1);
+      --color-charcoal-700: rgba(31, 33, 33, 1);
+      --color-charcoal-800: rgba(38, 40, 40, 1);
+      --color-slate-900: rgba(19, 52, 59, 1);
+      --color-teal-300: rgba(50, 184, 198, 1);
+      --color-teal-400: rgba(45, 166, 178, 1);
+      --color-teal-500: rgba(33, 128, 141, 1);
+      --color-teal-600: rgba(29, 116, 128, 1);
+      --color-teal-700: rgba(26, 104, 115, 1);
+      --color-red-400: rgba(255, 84, 89, 1);
+      --color-red-500: rgba(192, 21, 47, 1);
+      --color-orange-400: rgba(230, 129, 97, 1);
+      --color-orange-500: rgba(168, 75, 47, 1);
+      --color-brown-600-rgb: 94, 82, 64;
+      --color-teal-500-rgb: 33, 128, 141;
+      --color-slate-900-rgb: 19, 52, 59;
+      --color-background: var(--color-cream-50);
+      --color-surface: var(--color-cream-100);
+      --color-text: var(--color-slate-900);
+      --color-text-secondary: var(--color-slate-500);
+      --color-primary: var(--color-teal-500);
+      --color-primary-hover: var(--color-teal-600);
+      --color-border: rgba(var(--color-brown-600-rgb), 0.2);
+      --color-card-border: rgba(var(--color-brown-600-rgb), 0.12);
+      --font-family-base: "FKGroteskNeue", "Geist", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --font-size-sm: 12px;
+      --font-size-base: 14px;
+      --font-size-lg: 16px;
+      --font-size-xl: 18px;
+      --font-size-2xl: 20px;
+      --font-size-3xl: 24px;
+      --font-size-4xl: 30px;
+      --font-weight-medium: 500;
+      --font-weight-semibold: 550;
+      --font-weight-bold: 600;
+      --space-4: 4px;
+      --space-8: 8px;
+      --space-12: 12px;
+      --space-16: 16px;
+      --space-20: 20px;
+      --space-24: 24px;
+      --space-32: 32px;
+      --radius-base: 8px;
+      --radius-lg: 12px;
+      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.04);
+      --color-bg-1: rgba(59, 130, 246, 0.08);
+      --color-bg-2: rgba(245, 158, 11, 0.08);
+      --color-bg-3: rgba(34, 197, 94, 0.08);
+      --color-bg-4: rgba(239, 68, 68, 0.08);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --color-background: var(--color-charcoal-700);
+        --color-surface: var(--color-charcoal-800);
+        --color-text: var(--color-gray-200);
+        --color-text-secondary: rgba(167, 169, 169, 0.7);
+        --color-primary: var(--color-teal-300);
+        --color-primary-hover: var(--color-teal-400);
+        --color-border: rgba(119, 124, 124, 0.3);
+        --color-card-border: rgba(119, 124, 124, 0.2);
+      }
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: var(--font-family-base);
+      background-color: var(--color-background);
+      color: var(--color-text);
+      line-height: 1.5;
+      font-size: var(--font-size-base);
+    }
+
+    .app {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: var(--space-16);
+    }
+
+    /* Demo Banner */
+    .demo-banner {
+      background: linear-gradient(135deg, #0066CC 0%, #00CC66 100%);
+      color: white;
+      padding: var(--space-12);
+      text-align: center;
+      font-weight: var(--font-weight-semibold);
+      margin-bottom: var(--space-16);
+      border-radius: var(--radius-base);
+      font-size: var(--font-size-sm);
+    }
+
+    /* Header */
+    .header {
+      background: var(--color-surface);
+      padding: var(--space-20);
+      border-radius: var(--radius-lg);
+      margin-bottom: var(--space-24);
+      border: 1px solid var(--color-card-border);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .header h1 {
+      font-size: var(--font-size-4xl);
+      color: var(--color-primary);
+      margin-bottom: var(--space-8);
+      display: flex;
+      align-items: center;
+      gap: var(--space-12);
+    }
+
+    .header p {
+      color: var(--color-text-secondary);
+      font-size: var(--font-size-base);
+    }
+
+    /* Navigation */
+    .nav {
+      display: flex;
+      gap: var(--space-8);
+      margin-bottom: var(--space-24);
+      overflow-x: auto;
+      padding-bottom: var(--space-8);
+    }
+
+    .nav-btn {
+      padding: var(--space-12) var(--space-20);
+      background: var(--color-surface);
+      border: 1px solid var(--color-card-border);
+      border-radius: var(--radius-base);
+      cursor: pointer;
+      font-size: var(--font-size-base);
+      font-weight: var(--font-weight-medium);
+      color: var(--color-text);
+      transition: all 0.2s;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: var(--space-8);
+    }
+
+    .nav-btn:hover {
+      background: var(--color-primary);
+      color: white;
+      border-color: var(--color-primary);
+    }
+
+    .nav-btn.active {
+      background: var(--color-primary);
+      color: white;
+      border-color: var(--color-primary);
+    }
+
+    /* Cards */
+    .card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-card-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-20);
+      margin-bottom: var(--space-16);
+      box-shadow: var(--shadow-sm);
+      transition: box-shadow 0.2s;
+    }
+
+    .card:hover {
+      box-shadow: var(--shadow-md);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: var(--space-16);
+    }
+
+    .card-title {
+      font-size: var(--font-size-xl);
+      font-weight: var(--font-weight-bold);
+      color: var(--color-text);
+    }
+
+    /* Buttons */
+    .btn {
+      padding: var(--space-12) var(--space-20);
+      border: none;
+      border-radius: var(--radius-base);
+      font-size: var(--font-size-base);
+      font-weight: var(--font-weight-medium);
+      cursor: pointer;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-8);
+      justify-content: center;
+    }
+
+    .btn-primary {
+      background: var(--color-primary);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: var(--color-primary-hover);
+    }
+
+    .btn-secondary {
+      background: var(--color-surface);
+      color: var(--color-text);
+      border: 1px solid var(--color-border);
+    }
+
+    .btn-secondary:hover {
+      background: var(--color-bg-1);
+    }
+
+    .btn-danger {
+      background: var(--color-red-500);
+      color: white;
+    }
+
+    .btn-danger:hover {
+      background: var(--color-red-400);
+    }
+
+    .btn-small {
+      padding: var(--space-8) var(--space-12);
+      font-size: var(--font-size-sm);
+    }
+
+    /* Grid */
+    .grid {
+      display: grid;
+      gap: var(--space-16);
+    }
+
+    .grid-2 {
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    }
+
+    .grid-3 {
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    }
+
+    /* Stats Card */
+    .stat-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-card-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-20);
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: var(--font-size-3xl);
+      font-weight: var(--font-weight-bold);
+      color: var(--color-primary);
+      margin-bottom: var(--space-8);
+    }
+
+    .stat-label {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* Badge */
+    .badge {
+      display: inline-block;
+      padding: var(--space-4) var(--space-12);
+      border-radius: 999px;
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-medium);
+    }
+
+    .badge-success {
+      background: var(--color-bg-3);
+      color: #16a34a;
+    }
+
+    .badge-warning {
+      background: var(--color-bg-2);
+      color: #ca8a04;
+    }
+
+    .badge-danger {
+      background: var(--color-bg-4);
+      color: #dc2626;
+    }
+
+    .badge-info {
+      background: var(--color-bg-1);
+      color: #2563eb;
+    }
+
+    /* Form */
+    .form-group {
+      margin-bottom: var(--space-16);
+    }
+
+    .form-label {
+      display: block;
+      margin-bottom: var(--space-8);
+      font-weight: var(--font-weight-medium);
+      font-size: var(--font-size-base);
+    }
+
+    .form-input,
+    .form-select {
+      width: 100%;
+      padding: var(--space-12);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-base);
+      font-size: var(--font-size-base);
+      background: var(--color-surface);
+      color: var(--color-text);
+      font-family: var(--font-family-base);
+    }
+
+    .form-input:focus,
+    .form-select:focus {
+      outline: 2px solid var(--color-primary);
+      outline-offset: 0;
+      border-color: var(--color-primary);
+    }
+
+    /* Player List */
+    .player-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--space-12);
+      background: var(--color-surface);
+      border: 1px solid var(--color-card-border);
+      border-radius: var(--radius-base);
+      margin-bottom: var(--space-8);
+    }
+
+    .player-info {
+      display: flex;
+      align-items: center;
+      gap: var(--space-12);
+      flex: 1;
+    }
+
+    .player-number {
+      font-size: var(--font-size-xl);
+      font-weight: var(--font-weight-bold);
+      min-width: 30px;
+    }
+
+    .player-name {
+      font-weight: var(--font-weight-semibold);
+      font-size: var(--font-size-base);
+    }
+
+    .player-details {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-secondary);
+    }
+
+    .player-actions {
+      display: flex;
+      gap: var(--space-8);
+      align-items: center;
+    }
+
+    /* Stars Rating */
+    .stars {
+      color: #fbbf24;
+      font-size: var(--font-size-base);
+      letter-spacing: 2px;
+    }
+
+    /* Team Display */
+    .teams-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-24);
+      margin-top: var(--space-24);
+    }
+
+    .team-box {
+      background: var(--color-surface);
+      border: 2px solid;
+      border-radius: var(--radius-lg);
+      padding: var(--space-20);
+    }
+
+    .team-box.team-blue {
+      border-color: #3b82f6;
+    }
+
+    .team-box.team-red {
+      border-color: #ef4444;
+    }
+
+    .team-header {
+      text-align: center;
+      margin-bottom: var(--space-16);
+      padding-bottom: var(--space-12);
+      border-bottom: 1px solid var(--color-card-border);
+    }
+
+    .team-name {
+      font-size: var(--font-size-2xl);
+      font-weight: var(--font-weight-bold);
+      margin-bottom: var(--space-8);
+    }
+
+    .team-rating {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-secondary);
+    }
+
+    /* Toast Notification */
+    .toast {
+      position: fixed;
+      top: var(--space-20);
+      right: var(--space-20);
+      padding: var(--space-16) var(--space-24);
+      background: var(--color-primary);
+      color: white;
+      border-radius: var(--radius-base);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      z-index: 1000;
+      animation: slideIn 0.3s ease;
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateX(400px);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    .toast.success {
+      background: #16a34a;
+    }
+
+    .toast.error {
+      background: #dc2626;
+    }
+
+    /* Table */
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: var(--space-16);
+    }
+
+    .table th,
+    .table td {
+      padding: var(--space-12);
+      text-align: left;
+      border-bottom: 1px solid var(--color-card-border);
+    }
+
+    .table th {
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-text-secondary);
+      font-size: var(--font-size-sm);
+      text-transform: uppercase;
+    }
+
+    .table tr:hover {
+      background: var(--color-bg-1);
+      cursor: pointer;
+    }
+
+    /* Match Header */
+    .match-header {
+      background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-teal-700) 100%);
+      color: white;
+      padding: var(--space-24);
+      border-radius: var(--radius-lg);
+      margin-bottom: var(--space-24);
+    }
+
+    .match-header h2 {
+      font-size: var(--font-size-3xl);
+      margin-bottom: var(--space-12);
+    }
+
+    .match-info {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: var(--space-16);
+      margin-top: var(--space-16);
+    }
+
+    .match-info-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-8);
+    }
+
+    /* Loading */
+    .loading {
+      text-align: center;
+      padding: var(--space-32);
+      color: var(--color-text-secondary);
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 40px;
+      height: 40px;
+      border: 4px solid var(--color-border);
+      border-top-color: var(--color-primary);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Hidden class */
+    .hidden {
+      display: none !important;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .teams-container {
+        grid-template-columns: 1fr;
+      }
+
+      .nav {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+      }
+
+      .match-info {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Player Profile */
+    .profile-header {
+      text-align: center;
+      padding: var(--space-32);
+      background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-teal-700) 100%);
+      color: white;
+      border-radius: var(--radius-lg);
+      margin-bottom: var(--space-24);
+    }
+
+    .profile-name {
+      font-size: var(--font-size-4xl);
+      margin-bottom: var(--space-8);
+    }
+
+    .profile-stats {
+      display: flex;
+      justify-content: center;
+      gap: var(--space-24);
+      margin-top: var(--space-16);
+    }
+
+    .profile-stat {
+      text-align: center;
+    }
+
+    .profile-stat-value {
+      font-size: var(--font-size-2xl);
+      font-weight: var(--font-weight-bold);
+      display: block;
+    }
+
+    .profile-stat-label {
+      font-size: var(--font-size-sm);
+      opacity: 0.9;
+    }
+
+    /* Action Buttons Container */
+    .action-buttons {
+      display: flex;
+      gap: var(--space-8);
+      flex-wrap: wrap;
+      margin-top: var(--space-16);
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <!-- Demo Banner -->
+    <div class="demo-banner">
+      ⚠️ MODE DEMO - Les données sont stockées en mémoire et seront perdues au rafraîchissement de la page
+    </div>
+
+    <!-- Header -->
+    <div class="header">
+      <h1>⚽ FootMatch Organizer</h1>
+      <p>Gérez vos matchs de foot du dimanche entre amis</p>
+    </div>
+
+    <!-- Navigation -->
+    <div class="nav" id="navigation">
+      <button class="nav-btn active" onclick="showView('dashboard')">🏠 Tableau de bord</button>
+      <button class="nav-btn" onclick="showView('matches')">⚽ Matchs</button>
+      <button class="nav-btn" onclick="showView('players')">👥 Joueurs</button>
+      <button class="nav-btn" onclick="showView('stats')">📊 Statistiques</button>
+      <button class="nav-btn" onclick="showView('admin')" style="background: var(--color-bg-4);">🔐 Admin</button>
+    </div>
+
+    <!-- Views Container -->
+    <div id="viewContainer">
+    <div class="grid grid-3">
+      <div class="stat-card">
+        <div class="stat-value">13</div>
+        <div class="stat-label">Joueurs actifs</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">84%</div>
+        <div class="stat-label">Taux de présence</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">20%</div>
+        <div class="stat-label">Taux de paiement</div>
+      </div>
+    </div>
+    
+    
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">🎯 Prochain match</h2>
+          <span class="badge badge-success">Ouvert</span>
+        </div>
+        <div class="match-info">
+          <div class="match-info-item">
+            <span>📅</span>
+            <span>dimanche 23 novembre 2025</span>
+          </div>
+          <div class="match-info-item">
+            <span>🕐</span>
+            <span>RDV 10:45 - Match 11:00</span>
+          </div>
+          <div class="match-info-item">
+            <span>📍</span>
+            <span>TERRAIN 4 - UrbanSoccer Meudon</span>
+          </div>
+          <div class="match-info-item">
+            <span>⚽</span>
+            <span>Format 5x5 - 1h45</span>
+          </div>
+          <div class="match-info-item">
+            <span>💶</span>
+            <span>5€ par personne</span>
+          </div>
+          <div class="match-info-item">
+            <span>👥</span>
+            <span>10/10 joueurs inscrits</span>
+          </div>
+        </div>
+        <div class="action-buttons">
+          <button class="btn btn-primary" onclick="viewMatchDetail(1)">
+            Voir le match
+          </button>
+          
+            <button class="btn btn-secondary" onclick="generateTeams(1)">
+              🔄 Générer les équipes
+            </button>
+          
+        </div>
+      </div>
+    
+    
+    <div class="action-buttons">
+      <button class="btn btn-primary" onclick="showCreateMatch()">
+        ➕ Créer un match
+      </button>
+      <button class="btn btn-secondary" onclick="showView('matches')">
+        📋 Voir tous les matchs
+      </button>
+    </div>
+  </div>
+  </div>
+
+  <script src="FootMatch%20Organizer%20-%20G%C3%A9rez%20vos%20matchs%20de%20foot_fichiers/app.js"></script>
+
+</body></html>
