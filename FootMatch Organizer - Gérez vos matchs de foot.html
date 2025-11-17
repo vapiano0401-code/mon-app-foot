@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FootMatch Organizer PRO</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); min-height: 100vh; padding: 10px; }
+        .container { max-width: 1400px; margin: 0 auto; background: white; border-radius: 15px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); overflow: hidden; }
+        header { background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; }
+        header h1 { font-size: 24px; margin-bottom: 10px; }
+        .badge { background: #28a745; padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: bold; }
+        nav { display: flex; gap: 5px; flex-wrap: wrap; }
+        nav button { background: rgba(255,255,255,0.2); color: white; border: 2px solid white; padding: 8px 12px; border-radius: 5px; cursor: pointer; font-weight: bold; transition: 0.3s; font-size: 13px; }
+        nav button:hover, nav button.active { background: white; color: #2a5298; }
+        .content { padding: 20px; }
+        .section { display: none; }
+        .section.active { display: block; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; font-weight: bold; margin-bottom: 5px; color: #333; font-size: 13px; }
+        input, select, textarea { width: 100%; padding: 8px; border: 2px solid #ddd; border-radius: 5px; font-family: inherit; font-size: 13px; }
+        input:focus, select:focus { outline: none; border-color: #2a5298; box-shadow: 0 0 5px rgba(42, 82, 152, 0.3); }
+        .btn { background: #2a5298; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 13px; transition: 0.3s; margin: 5px 5px 5px 0; }
+        .btn:hover { background: #1e3c72; transform: translateY(-2px); }
+        .btn-secondary { background: #6c757d; }
+        .btn-secondary:hover { background: #5a6268; }
+        .btn-danger { background: #dc3545; }
+        .btn-danger:hover { background: #c82333; }
+        .card { background: #f8f9fa; border-left: 4px solid #2a5298; padding: 15px; margin-bottom: 15px; border-radius: 5px; }
+        .card h3 { color: #2a5298; margin-bottom: 10px; font-size: 16px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
+        .stat-box { background: #f8f9fa; padding: 15px; text-align: center; border-radius: 5px; }
+        .stat-box .number { font-size: 28px; font-weight: bold; color: #2a5298; }
+        .stat-box .label { color: #666; margin-top: 5px; font-size: 12px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 13px; }
+        table th { background: #2a5298; color: white; padding: 10px; text-align: left; }
+        table td { padding: 10px; border-bottom: 1px solid #ddd; }
+        table tr:hover { background: #f8f9fa; }
+        .badge-status { display: inline-block; padding: 4px 8px; border-radius: 15px; font-size: 11px; font-weight: bold; }
+        .badge-open { background: #d4edda; color: #155724; }
+        .badge-complete { background: #cce5ff; color: #004085; }
+        .badge-paid { background: #d4edda; color: #155724; }
+        .badge-pending { background: #fff3cd; color: #856404; }
+        .leaderboard { margin-top: 15px; }
+        .leaderboard-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; background: #f8f9fa; margin-bottom: 8px; border-radius: 5px; border-left: 4px solid #2a5298; font-size: 13px; }
+        .rank { width: 25px; height: 25px; background: #2a5298; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; margin-right: 10px; }
+        .admin-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-top: 20px; }
+        .admin-btn { background: #17a2b8; color: white; padding: 30px; text-align: center; border-radius: 10px; cursor: pointer; transition: 0.3s; border: none; font-size: 14px; font-weight: bold; }
+        .admin-btn:hover { background: #138496; }
+        .admin-section { margin-top: 30px; }
+        hr { margin: 20px 0; border: none; border-top: 2px solid #ddd; }
+        @media (max-width: 768px) { header { flex-direction: column; } nav { width: 100%; } nav button { flex: 1; } .grid { grid-template-columns: 1fr; } table { font-size: 11px; } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div>
+                <h1>⚽ FootMatch Organizer PRO</h1>
+                <span class="badge">✅ VERSION COMPLÈTE</span>
+            </div>
+            <nav>
+                <button class="nav-btn active" onclick="switchView('dashboard')">🏠 Accueil</button>
+                <button class="nav-btn" onclick="switchView('matches')">⚽ Matchs</button>
+                <button class="nav-btn" onclick="switchView('players')">👥 Joueurs</button>
+                <button class="nav-btn" onclick="switchView('stats')">📊 Stats</button>
+                <button class="nav-btn" onclick="switchView('admin')">⚙️ Admin</button>
+            </nav>
+        </header>
+
+        <div class="content">
+            <!-- DASHBOARD -->
+            <div id="dashboard" class="section active">
+                <h2>📊 Dashboard</h2>
+                <div class="grid">
+                    <div class="stat-box"><div class="number" id="totalMatches">0</div><div class="label">Matchs</div></div>
+                    <div class="stat-box"><div class="number" id="totalPlayers">0</div><div class="label">Joueurs</div></div>
+                    <div class="stat-box"><div class="number" id="totalGoals">0</div><div class="label">Buts</div></div>
+                    <div class="stat-box"><div class="number" id="totalAssists">0</div><div class="label">Passes</div></div>
+                </div>
+                <h3 style="margin-top: 30px;">💰 Statistiques Paiements</h3>
+                <div class="grid">
+                    <div class="stat-box"><div class="number" id="totalCollected">0€</div><div class="label">Collecté</div></div>
+                    <div class="stat-box"><div class="number" id="totalPending">0€</div><div class="label">En Attente</div></div>
+                    <div class="stat-box"><div class="number" id="pendingCount">0</div><div class="label">Paiements En Attente</div></div>
+                </div>
+            </div>
+
+            <!-- MATCHS -->
+            <div id="matches" class="section">
+                <h2>⚽ Gestion des Matchs</h2>
+                <h3>Créer un Match</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px;">
+                    <div class="form-group"><label>Format</label><input type="text" id="matchFormat" value="5x5"></div>
+                    <div class="form-group"><label>Date</label><input type="date" id="matchDate"></div>
+                    <div class="form-group"><label>Heure Match</label><input type="time" id="matchTime" value="11:00"></div>
+                    <div class="form-group"><label>RDV</label><input type="time" id="matchRDV" value="10:45"></div>
+                    <div class="form-group"><label>Lieu</label><input type="text" id="matchLocation" placeholder="Ex: Terrain 4"></div>
+                    <div class="form-group"><label>Prix (€)</label><input type="number" id="matchPrice" value="5"></div>
+                    <div class="form-group"><label>Max joueurs</label><input type="number" id="matchMaxPlayers" value="10"></div>
+                </div>
+                <button class="btn" onclick="createMatch()">✅ Créer Match</button>
+                <h3 style="margin-top: 30px;">Matchs Existants</h3>
+                <div id="matchesList"></div>
+            </div>
+
+            <!-- JOUEURS -->
+            <div id="players" class="section">
+                <h2>👥 Gestion des Joueurs</h2>
+                <h3>Ajouter un Joueur</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px;">
+                    <div class="form-group"><label>Nom</label><input type="text" id="playerName"></div>
+                    <div class="form-group"><label>Téléphone</label><input type="tel" id="playerPhone"></div>
+                    <div class="form-group"><label>Position</label><select id="playerPosition"><option>Gardien</option><option>Défenseur</option><option>Milieu</option><option>Attaquant</option></select></div>
+                    <div class="form-group"><label>Pied fort</label><select id="playerFoot"><option>Droit</option><option>Gauche</option></select></div>
+                </div>
+                <button class="btn" onclick="addPlayer()">✅ Ajouter</button>
+                <h3 style="margin-top: 30px;">Liste des Joueurs</h3>
+                <div id="playersList"></div>
+            </div>
+
+            <!-- STATS -->
+            <div id="stats" class="section">
+                <h2>📊 Statistiques</h2>
+                <h3>🥅 Top Scorers</h3>
+                <div id="topScorers" class="leaderboard"></div>
+                <h3 style="margin-top: 30px;">🎯 Top Assisters</h3>
+                <div id="topAssisters" class="leaderboard"></div>
+                <h3 style="margin-top: 30px;">⭐ Fair Play</h3>
+                <div id="fairPlay" class="leaderboard"></div>
+            </div>
+
+            <!-- ADMIN -->
+            <div id="admin" class="section">
+                <h2>⚙️ Admin Panel</h2>
+                <div id="adminLogin" class="form-group">
+                    <label>Mot de passe Admin</label>
+                    <input type="password" id="adminPassword" placeholder="Entrez le mot de passe">
+                    <button class="btn" onclick="loginAdmin()">Connexion</button>
+                </div>
+                <div id="adminPanel" style="display: none;">
+                    <div class="admin-grid">
+                        <button class="admin-btn" onclick="showAdminSection('config')">⚙️ Configuration</button>
+                        <button class="admin-btn" onclick="showAdminSection('players_mgmt')">👥 Joueurs</button>
+                        <button class="admin-btn" onclick="showAdminSection('matches_mgmt')">⚽ Matchs</button>
+                        <button class="admin-btn" onclick="showAdminSection('payments')">💰 Paiements</button>
+                        <button class="admin-btn" onclick="showAdminSection('reports')">📊 Rapports</button>
+                        <button class="admin-btn" onclick="showAdminSection('security')">🔐 Sécurité</button>
+                    </div>
+
+                    <!-- CONFIGURATION -->
+                    <div id="config" class="admin-section" style="display: none;">
+                        <h3>⚙️ Configuration</h3>
+                        <div class="form-group"><label>Prix par défaut</label><input type="number" id="defaultPrice" value="5"></div>
+                        <div class="form-group"><label>Format par défaut</label><input type="text" id="defaultFormat" value="5x5"></div>
+                        <button class="btn" onclick="saveSettings()">💾 Sauvegarder</button>
+                    </div>
+
+                    <!-- GESTION JOUEURS -->
+                    <div id="players_mgmt" class="admin-section" style="display: none;">
+                        <h3>👥 Gestion Joueurs</h3>
+                        <div id="playersManagement"></div>
+                    </div>
+
+                    <!-- GESTION MATCHS -->
+                    <div id="matches_mgmt" class="admin-section" style="display: none;">
+                        <h3>⚽ Gestion Matchs</h3>
+                        <div id="matchesManagement"></div>
+                    </div>
+
+                    <!-- PAIEMENTS -->
+                    <div id="payments" class="admin-section" style="display: none;">
+                        <h3>💰 Gestion des Paiements</h3>
+                        <div class="grid">
+                            <div class="stat-box"><div class="number" id="paymentStats1">0€</div><div class="label">Total Collecté</div></div>
+                            <div class="stat-box"><div class="number" id="paymentStats2">0€</div><div class="label">En Attente</div></div>
+                        </div>
+                        <h4 style="margin-top: 20px;">Liste des Paiements</h4>
+                        <div id="paymentsList"></div>
+                    </div>
+
+                    <!-- RAPPORTS -->
+                    <div id="reports" class="admin-section" style="display: none;">
+                        <h3>📊 Rapports</h3>
+                        <h4>Joueurs les Plus Actifs</h4>
+                        <div id="reportsMostActive"></div>
+                        <h4 style="margin-top: 20px;">Top Buteurs</h4>
+                        <div id="reportsTopScorers"></div>
+                    </div>
+
+                    <!-- SÉCURITÉ -->
+                    <div id="security" class="admin-section" style="display: none;">
+                        <h3>🔐 Sécurité</h3>
+                        <div class="form-group">
+                            <label>Nouveau Mot de Passe Admin</label>
+                            <input type="password" id="newAdminPassword" placeholder="Entrez le nouveau mot de passe">
+                            <button class="btn" onclick="changeAdminPassword()">💾 Changer le MDP</button>
+                        </div>
+                        <hr>
+                        <button class="btn" onclick="downloadBackup()">📥 Télécharger Backup</button>
+                        <button class="btn btn-danger" onclick="resetAllData()">🔄 Réinitialiser Données</button>
+                        <button class="btn btn-secondary" onclick="logoutAdmin()">Déconnexion</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const ADMIN_PASSWORD = "Meudon2025";
+        let adminLogged = false;
+        let data = {
+            matches: [],
+            players: [],
+            payments: [],
+            adminPassword: ADMIN_PASSWORD,
+            settings: { defaultPrice: 5, defaultFormat: "5x5" }
+        };
+
+        window.addEventListener('load', () => {
+            loadSampleData();
+            updateAllDisplays();
+        });
+
+        function loadSampleData() {
+            if (data.players.length === 0) {
+                data.players = [
+                    { id: 1, name: "Ahmed El", phone: "+33612345001", position: "Attaquant", foot: "Droit", goals: 23, assists: 8, rating: 4.2, matchesPlayed: 15 },
+                    { id: 2, name: "Ahmed", phone: "+33612345002", position: "Milieu", foot: "Gauche", goals: 5, assists: 14, rating: 3.8, matchesPlayed: 12 },
+                    { id: 3, name: "Pierre", phone: "+33612345004", position: "Gardien", foot: "Gauche", goals: 0, assists: 0, rating: 4.5, matchesPlayed: 20 },
+                    { id: 4, name: "Ayoub", phone: "+33612345008", position: "Attaquant", foot: "Droit", goals: 31, assists: 6, rating: 4.3, matchesPlayed: 17 },
+                    { id: 5, name: "Oussama", phone: "+33612345003", position: "Défenseur", foot: "Droit", goals: 2, assists: 1, rating: 4.0, matchesPlayed: 18 }
+                ];
+                data.matches = [
+                    { id: 1, format: "5x5", date: "2025-11-23", time: "11:00", rdvTime: "10:45", location: "UrbanSoccer Meudon", price: 5, maxPlayers: 10, players: [1,2,3,4,5], status: "open" }
+                ];
+                data.payments = [
+                    { id: 1, matchId: 1, userId: 1, userName: "Ahmed El", amount: 5, status: "paid", method: "cash", date: "2025-11-20" },
+                    { id: 2, matchId: 1, userId: 2, userName: "Ahmed", amount: 5, status: "pending", method: "stripe", date: "2025-11-22" },
+                    { id: 3, matchId: 1, userId: 3, userName: "Pierre", amount: 5, status: "paid", method: "transfer", date: "2025-11-21" },
+                    { id: 4, matchId: 1, userId: 4, userName: "Ayoub", amount: 5, status: "pending", method: "cash", date: "2025-11-22" }
+                ];
+            }
+        }
+
+        function updateAllDisplays() {
+            updateDashboard();
+            renderMatches();
+            renderPlayers();
+            updateStats();
+            updatePaymentsDisplay();
+        }
+
+        function switchView(view) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(view).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function createMatch() {
+            const match = {
+                id: Date.now(),
+                format: document.getElementById('matchFormat').value,
+                date: document.getElementById('matchDate').value,
+                time: document.getElementById('matchTime').value,
+                rdvTime: document.getElementById('matchRDV').value,
+                location: document.getElementById('matchLocation').value,
+                price: parseFloat(document.getElementById('matchPrice').value),
+                maxPlayers: parseInt(document.getElementById('matchMaxPlayers').value),
+                players: [],
+                status: 'open'
+            };
+            data.matches.push(match);
+            renderMatches();
+            alert('✅ Match créé !');
+            document.querySelectorAll('#matches input').forEach(i => i.value = '');
+        }
+
+        function renderMatches() {
+            const list = document.getElementById('matchesList');
+            list.innerHTML = data.matches.map(m => `
+                <div class="card">
+                    <h3>${m.format} - ${m.date} ${m.time}</h3>
+                    <p>📍 ${m.location} | 💵 ${m.price}€ | 👥 ${m.players.length}/${m.maxPlayers}</p>
+                    <span class="badge-status ${m.status === 'open' ? 'badge-open' : 'badge-complete'}">${m.status}</span>
+                    <button class="btn" onclick="registerMatch(${m.id})">📝 S'inscrire</button>
+                    <button class="btn btn-secondary" onclick="deleteMatch(${m.id})">🗑️ Supprimer</button>
+                </div>
+            `).join('');
+        }
+
+        function registerMatch(matchId) {
+            const match = data.matches.find(m => m.id === matchId);
+            if (match && match.players.length < match.maxPlayers) {
+                match.players.push(Math.floor(Math.random() * data.players.length) + 1);
+                renderMatches();
+                alert('✅ Inscrit !');
+            }
+        }
+
+        function deleteMatch(matchId) {
+            data.matches = data.matches.filter(m => m.id !== matchId);
+            renderMatches();
+        }
+
+        function addPlayer() {
+            const player = {
+                id: Date.now(),
+                name: document.getElementById('playerName').value,
+                phone: document.getElementById('playerPhone').value,
+                position: document.getElementById('playerPosition').value,
+                foot: document.getElementById('playerFoot').value,
+                goals: 0,
+                assists: 0,
+                rating: 0,
+                matchesPlayed: 0
+            };
+            if (!player.name) return alert('Entrez un nom !');
+            data.players.push(player);
+            renderPlayers();
+            alert('✅ Joueur ajouté !');
+            document.querySelectorAll('#players input').forEach(i => i.value = '');
+        }
+
+        function renderPlayers() {
+            const list = document.getElementById('playersList');
+            if (data.players.length === 0) {
+                list.innerHTML = '<p>Aucun joueur</p>';
+                return;
+            }
+            list.innerHTML = `<table><thead><tr><th>Nom</th><th>Position</th><th>🥅 Buts</th><th>🎯 Passes</th><th>⭐ Rating</th><th>Matchs</th><th>Action</th></tr></thead><tbody>${data.players.map(p => `<tr><td>${p.name}</td><td>${p.position}</td><td>${p.goals}</td><td>${p.assists}</td><td>${'⭐'.repeat(Math.round(p.rating))}</td><td>${p.matchesPlayed}</td><td><button class="btn btn-danger" style="padding: 4px 8px; font-size: 11px;" onclick="deletePlayer(${p.id})">❌</button></td></tr>`).join('')}</tbody></table>`;
+        }
+
+        function deletePlayer(id) {
+            data.players = data.players.filter(p => p.id !== id);
+            renderPlayers();
+        }
+
+        function updateStats() {
+            const scorers = [...data.players].sort((a, b) => b.goals - a.goals).slice(0, 5);
+            const assisters = [...data.players].sort((a, b) => b.assists - a.assists).slice(0, 5);
+            const fairPlayPlayers = [...data.players].sort((a, b) => b.rating - a.rating).slice(0, 5);
+            
+            document.getElementById('topScorers').innerHTML = scorers.map((p, i) => `<div class="leaderboard-item"><div style="display: flex; align-items: center;"><div class="rank">${i+1}</div>${p.name}</div><strong>🥅 ${p.goals}</strong></div>`).join('');
+            document.getElementById('topAssisters').innerHTML = assisters.map((p, i) => `<div class="leaderboard-item"><div style="display: flex; align-items: center;"><div class="rank">${i+1}</div>${p.name}</div><strong>🎯 ${p.assists}</strong></div>`).join('');
+            document.getElementById('fairPlay').innerHTML = fairPlayPlayers.map((p, i) => `<div class="leaderboard-item"><div style="display: flex; align-items: center;"><div class="rank">${i+1}</div>${p.name}</div><strong>⭐ ${p.rating.toFixed(1)}</strong></div>`).join('');
+        }
+
+        function updateDashboard() {
+            document.getElementById('totalMatches').textContent = data.matches.length;
+            document.getElementById('totalPlayers').textContent = data.players.length;
+            document.getElementById('totalGoals').textContent = data.players.reduce((s, p) => s + p.goals, 0);
+            document.getElementById('totalAssists').textContent = data.players.reduce((s, p) => s + p.assists, 0);
+            const paid = data.payments.filter(p => p.status === 'paid').reduce((s, p) => s + p.amount, 0);
+            const pending = data.payments.filter(p => p.status === 'pending').reduce((s, p) => s + p.amount, 0);
+            document.getElementById('totalCollected').textContent = paid + '€';
+            document.getElementById('totalPending').textContent = pending + '€';
+            document.getElementById('pendingCount').textContent = data.payments.filter(p => p.status === 'pending').length;
+        }
+
+        function updatePaymentsDisplay() {
+            const stats1 = data.payments.filter(p => p.status === 'paid').reduce((s, p) => s + p.amount, 0);
+            const stats2 = data.payments.filter(p => p.status === 'pending').reduce((s, p) => s + p.amount, 0);
+            document.getElementById('paymentStats1').textContent = stats1 + '€';
+            document.getElementById('paymentStats2').textContent = stats2 + '€';
+            
+            document.getElementById('paymentsList').innerHTML = `<table><thead><tr><th>Joueur</th><th>Montant</th><th>Status</th><th>Méthode</th><th>Action</th></tr></thead><tbody>${data.payments.map(p => `<tr><td>${p.userName}</td><td>${p.amount}€</td><td><span class="badge-status ${p.status === 'paid' ? 'badge-paid' : 'badge-pending'}">${p.status}</span></td><td>${p.method}</td><td><button class="btn btn-secondary" style="padding: 4px 8px; font-size: 11px;" onclick="togglePaymentStatus(${p.id})">✓ ${p.status === 'paid' ? 'En attente' : 'Payé'}</button></td></tr>`).join('')}</tbody></table>`;
+        }
+
+        function togglePaymentStatus(id) {
+            const payment = data.payments.find(p => p.id === id);
+            if (payment) {
+                payment.status = payment.status === 'paid' ? 'pending' : 'paid';
+                updatePaymentsDisplay();
+                updateDashboard();
+            }
+        }
+
+        function loginAdmin() {
+            if (document.getElementById('adminPassword').value === data.adminPassword) {
+                adminLogged = true;
+                document.getElementById('adminLogin').style.display = 'none';
+                document.getElementById('adminPanel').style.display = 'block';
+                alert('✅ Admin connecté !');
+            } else {
+                alert('❌ Mot de passe incorrect !');
+            }
+        }
+
+        function logoutAdmin() {
+            adminLogged = false;
+            document.getElementById('adminLogin').style.display = 'block';
+            document.getElementById('adminPanel').style.display = 'none';
+            document.getElementById('adminPassword').value = '';
+            document.querySelectorAll('.admin-section').forEach(s => s.style.display = 'none');
+        }
+
+        function showAdminSection(section) {
+            document.querySelectorAll('.admin-section').forEach(s => s.style.display = 'none');
+            document.getElementById(section).style.display = 'block';
+            
+            if (section === 'players_mgmt') {
+                document.getElementById('playersManagement').innerHTML = data.players.length > 0 ? `<table><thead><tr><th>Nom</th><th>Position</th><th>Buts</th><th>Passes</th><th>Action</th></tr></thead><tbody>${data.players.map(p => `<tr><td>${p.name}</td><td>${p.position}</td><td>${p.goals}</td><td>${p.assists}</td><td><button class="btn btn-danger" style="padding: 4px 8px; font-size: 11px;" onclick="deletePlayer(${p.id})">❌</button></td></tr>`).join('')}</tbody></table>` : '<p>Aucun joueur</p>';
+            }
+            
+            if (section === 'matches_mgmt') {
+                document.getElementById('matchesManagement').innerHTML = data.matches.length > 0 ? `<table><thead><tr><th>Format</th><th>Date</th><th>Lieu</th><th>Joueurs</th><th>Status</th><th>Action</th></tr></thead><tbody>${data.matches.map(m => `<tr><td>${m.format}</td><td>${m.date}</td><td>${m.location}</td><td>${m.players.length}/${m.maxPlayers}</td><td>${m.status}</td><td><button class="btn btn-danger" style="padding: 4px 8px; font-size: 11px;" onclick="deleteMatch(${m.id})">❌</button></td></tr>`).join('')}</tbody></table>` : '<p>Aucun match</p>';
+            }
+            
+            if (section === 'reports') {
+                const mostActive = [...data.players].sort((a, b) => b.matchesPlayed - a.matchesPlayed).slice(0, 5);
+                const topScorers = [...data.players].sort((a, b) => b.goals - a.goals).slice(0, 5);
+                document.getElementById('reportsMostActive').innerHTML = mostActive.map((p, i) => `<div class="leaderboard-item"><div class="rank">${i+1}</div><span>${p.name}</span><strong>${p.matchesPlayed} matchs</strong></div>`).join('');
+                document.getElementById('reportsTopScorers').innerHTML = topScorers.map((p, i) => `<div class="leaderboard-item"><div class="rank">${i+1}</div><span>${p.name}</span><strong>🥅 ${p.goals}</strong></div>`).join('');
+            }
+        }
+
+        function changeAdminPassword() {
+            const newPwd = document.getElementById('newAdminPassword').value;
+            if (!newPwd || newPwd.length < 4) return alert('Minimum 4 caractères !');
+            data.adminPassword = newPwd;
+            document.getElementById('newAdminPassword').value = '';
+            alert('✅ Mot de passe changé !');
+        }
+
+        function saveSettings() {
+            data.settings.defaultPrice = parseFloat(document.getElementById('defaultPrice').value);
+            data.settings.defaultFormat = document.getElementById('defaultFormat').value;
+            alert('💾 Paramètres sauvegardés !');
+        }
+
+        function downloadBackup() {
+            const backup = JSON.stringify(data, null, 2);
+            const blob = new Blob([backup], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `footmatch-backup-${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+        }
+
+        function resetAllData() {
+            if (confirm('⚠️ Êtes-vous SÛR ? Cela supprimera TOUT !')) {
+                data = { matches: [], players: [], payments: [], adminPassword: data.adminPassword, settings: { defaultPrice: 5, defaultFormat: "5x5" } };
+                updateAllDisplays();
+                alert('🔄 Données réinitialisées !');
+            }
+        }
+    </script>
+</body>
+</html>
